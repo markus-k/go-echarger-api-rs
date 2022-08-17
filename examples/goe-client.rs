@@ -1,4 +1,4 @@
-use go_echarger_api::connection::{http::DirectHttpChargerConnection, GoECharger};
+use go_echarger_api::{connection::http::DirectHttpChargerConnection, GoECharger};
 
 #[tokio::main]
 async fn main() {

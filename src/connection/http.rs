@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
 use crate::connection::{ChargerConnection, GoEError};
-use crate::{GoEStatus, StatusJson};
+use crate::status::{GoEStatus, StatusJson};
 
 pub struct DirectHttpChargerConnection {
     host: String,
@@ -27,9 +27,16 @@ impl DirectHttpChargerConnection {
 
 #[async_trait]
 impl ChargerConnection for DirectHttpChargerConnection {
-    type ConnError = reqwest::Error;
+    async fn set_key(&mut self, key: &str, value: &str) -> Result<(), GoEError> {
+        let endpoint = format!("{}mqtt", self.base_url());
+        let _new_status = reqwest::Client::new()
+            .request("SET".parse().unwrap(), endpoint)
+            .query(&[("payload", format!("{key}={value}"))])
+            .send()
+            .await?
+            .json::<StatusJson>()
+            .await?;
 
-    async fn set_key(&mut self, key: String, value: String) -> Result<(), Self::ConnError> {
         Ok(())
     }
 
